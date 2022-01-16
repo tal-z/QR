@@ -28,7 +28,7 @@ It's a QR code generator that generates exactly one QR code!
 ###### Step 6: Data Masking - Apply a transformation to the generated modules, in order to reduce patterns that make it difficult for a scanner to read the code.
   - There are 8 transformations supported by the QR specification, numbered in range(8).
   - Ideally, we should select the mask which produces the lowest "penalty score." For the purposes of this project, I will probably implement just one mask pattern.
-Step 7: Format and Version information - Add information about the size of the QR code
+###### Step 7: Format and Version information - Add information about the size of the QR code
   - Format includes error correction level and data mask
   - Version relates to the QR code's size
 
