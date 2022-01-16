@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 from matplotlib import colors
 import numpy as np
 
-from latin1_to_binary import pad_binary
+from helpers import pad_binary
 from encoding_mode import get_encoding_mode
 
 ''' Early Work
