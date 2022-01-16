@@ -5,12 +5,6 @@ The goal is to make one single QR code from scratch, which re-directs to http://
 It's a QR code generator that generates exactly one QR code!
 
 
-### So far, I have done the following:
-  - Read up on what QR codes are, where they're from, what they contain, and what each content does.
-  - implemented a tiny module for converting strings into binary representation
-  - implemented a function for checking whether a string is numeric, alphanumeric, latin-1, or kanji 
-    - (not actually checking if kanji, just defaulting to it if none of the other 3)
-
 
 ### QR Code Generation Steps:
 ###### Step 1: Data Analysis - Determine the data type to use based on the provided text.
