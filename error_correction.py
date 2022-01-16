@@ -33,7 +33,7 @@ def mul(a, b):
 
 
 def div(a, b):
-    return exp[(log[a] + log[b] * 254 % 255)]
+    return exp[((log[a] + log[b] * 254) % 255)]
 
-print(div(2,128))
+print(mul(16, 32))
 
