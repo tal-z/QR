@@ -1,4 +1,4 @@
-''' Early Attempts
+## Early Attempts
 """
 const LOG = new Uint8Array(256);
 const EXP = new Uint8Array(256);
@@ -35,12 +35,5 @@ def mul(a, b):
 def div(a, b):
     return exp[(log[a] + log[b] * 254 % 255)]
 
-print(div(128,2))
-'''
-# With modules
-import galois
+print(div(2,128))
 
-GF256 = galois.GF(2**8)
-
-
-GF256.
