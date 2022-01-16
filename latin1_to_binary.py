@@ -1,20 +1,36 @@
 
-def pad_binary(string):
-    pad = 8 - (len(string) - 2)
-    return '0' * pad + string[2:]
+from helpers import pad_binary
+from print_context_manager import VerboseControl
+
+
+def latin1_to_padded_bytes_list(string):
+    """
+    :param string:
+    :return list:
+    """
+    ba = bytearray(string, 'latin-1')
+    return [pad_binary(bin(b)) for b in ba]
 
 
 def latin1_to_bitstring(string):
-    ba = bytearray(string, 'latin-1')
-    binary = [pad_binary(bin(b)) for b in ba]
+    """
+    :param string:
+    :return bitstring:
+    """
+    binary = latin1_to_padded_bytes_list(string)
     return ''.join(binary)
 
 
 def terminate_bitstring(bitstring, required_bits=128):
-    """adds a terminator to the end of a bitstring, based on a required padding length"""
+    """
+    Adds a terminator to the end of a bitstring, based on a required padding length.
+    :param bitstring:
+    :return bitstring:
+    """
     bs_len = len(bitstring)
     if bs_len > required_bits:
-        raise ValueError("Bitstring is too long for the number of bits required by this version and error correction level.")
+        raise ValueError(
+            "Bitstring is too long for the number of bits required by this version and error correction level.")
     if bs_len == required_bits:
         return bitstring
     elif required_bits - bs_len < 4:
@@ -24,6 +40,11 @@ def terminate_bitstring(bitstring, required_bits=128):
 
 
 def make_8_divisible_bitstring(bitstring):
+    """
+    Pads a terminated string with the minimum number of zeros needed to make it's length be divisible by 8
+    :param bitstring:
+    :return bitstring:
+    """
     bs_len = len(bitstring)
     mod = bs_len % 8
     if not mod:
@@ -32,16 +53,49 @@ def make_8_divisible_bitstring(bitstring):
         return bitstring + '0' * mod
 
 
+def final_pad_bitstring(bitstring, required_bits=128):
+    """
+    Pad bitstring to required length using QR specification,
+    which alternates between 8-bit representation of 236 and 17 until required bits are reached.
+    :param bitstring:
+    :return bitstring:
+    """
+    twothirtysix, seventeen = '11101100', '00010001'
+    num_pads = int((required_bits - len(bitstring)) / 8)
+    for i in range(num_pads):
+        if not i % 2:
+            bitstring += twothirtysix
+        else:
+            bitstring += seventeen
+    return bitstring
+
+
+def encode_data(data, verbose=True):
+    """
+    Runs pipeline to take text and convert it into bitstring necessary for encoding in a QR code.
+
+    NOTE: This is for purely educational purposes, and is somewhat optimized for my specifically intended outcome.
+            At best, this will only work with really small strings, 14 characters or less.
+
+    :param data:
+    :param verbose:
+    :return bitstring:
+    """
+    with VerboseControl(verbose=verbose):
+        print("Converting input text to bitstring using latin-1 encoding.")
+        bit_string = latin1_to_bitstring(data)
+        print("~~ current bitstring:", bit_string)
+        print("Adding termination modules to bitstring based on required bit length.")
+        terminated_bit_string = terminate_bitstring(bit_string)
+        print("~~ current bitstring:", terminated_bit_string)
+        print("Padding bitstring with zeros, such that its length is divisible by eight.")
+        padded_terminated_bit_string = make_8_divisible_bitstring(terminated_bit_string)
+        print("~~ current bitstring:", padded_terminated_bit_string)
+        print("Padding bitstring to the required bit length.")
+        final_padded_terminated_bit_string = final_pad_bitstring(padded_terminated_bit_string)
+        print("~~ final encoded bitstring:", final_padded_terminated_bit_string)
+        return final_padded_terminated_bit_string
+
 
 if __name__ == '__main__':
-    s = 'talzaken.com'
-    bs = latin1_to_bitstring(s)
-    print(bs)
-    print(len(bs))
-
-    tbs = terminate_bitstring(bs)
-    print(len(tbs))
-    ptbs = make_8_divisible_bitstring(tbs)
-    print(len(ptbs))
-
-
+    encode_data('talzaken.com', verbose=False)
