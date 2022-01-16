@@ -32,20 +32,19 @@ It's a QR code generator that generates exactly one QR code!
   - Format includes error correction level and data mask
   - Version relates to the QR code's size
 
-
-
-
-
-
-  1. Add Finder Patterns
-  2. Add Separators (or just leave space for them)
-  3. Add Alignment Patterns (not used in Version 1)
-  4. Add error correction level
-  5. Add the Mode (data type) Indicator
-  6. Add the Character Count Indicatorv
-  7. Add Timing Patterns
-  8. Add Dark Module and Reserved Areas (for format and version info)
+##### Operations to Handle:
+  1. ~~Add Finder Patterns~~
+  2. ~~Add Separators (or just leave space for them)~~
+  3. ~~Add Alignment Patterns (not used in Version 1)~~
+  4. ~~Add error correction level~~
+  5. ~~Add the Mode (data type) Indicator~~
+  6. ~~Add the Character Count Indicator~~
+  7. ~~Add Timing Patterns~~
+  8. ~~Add Dark Module and Reserved Areas (for format and version info)~~
   9. Add the data (which needs to be encoded first.)
+  10. Generate Error Correction Codewords
+  11. Generate Data Codewords?? Maybe not?
+  12. Apply mask
 
 
 ### Concepts:
