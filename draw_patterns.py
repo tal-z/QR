@@ -1,5 +1,4 @@
-import matplotlib.pyplot as plt
-from matplotlib import colors
+
 import numpy as np
 
 from helpers import pad_binary, bitstring_to_byte_strings
@@ -7,8 +6,6 @@ from encoding_mode import get_encoding_mode
 from latin1_to_binary import encode_data
 from error_correction import generate_code_words
 
-
-v1_base_grid = np.zeros((21, 21))
 
 def draw_finder_patterns(grid):
     """fills in corners of grid with easily-recognized square QR pattern"""
@@ -271,30 +268,3 @@ def brute_force_post_masked_codewords(grid):
         bits = code_words[idx]
         for bit, coord in zip(bits, coordinates):
             grid[coord] = bit
-
-# Update the QR Code
-draw_finder_patterns(v1_base_grid)
-draw_timing_patterns(v1_base_grid)
-draw_dark_module(v1_base_grid)
-draw_data(v1_base_grid, 'talzaken.com')
-draw_code_words(v1_base_grid, 'talzaken.com')
-
-draw_format_strings(v1_base_grid)
-apply_mask(v1_base_grid)
-brute_force_post_masked_codewords(v1_base_grid)
-
-
-
-
-# Plot and show the QR Code
-fig, ax = plt.subplots()
-cmap = colors.ListedColormap(['white', 'black'])
-plt.imshow(v1_base_grid, cmap=cmap)
-#ax.set_xticks([])
-#ax.set_yticks([])
-
-plt.imshow(v1_base_grid, cmap=cmap)
-plt.axis('off')
-
-plt.show()
-
