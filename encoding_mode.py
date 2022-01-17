@@ -1,5 +1,5 @@
 import re
-from print_context_manager import VerboseControl
+from helpers import VerboseControl
 
 
 numeric_re = re.compile(r'^\d*$')
@@ -22,7 +22,6 @@ def get_encoding_mode(string, verbose=True):
         else:
             print("Encoding Mode not numeric, alphanumeric, or latin-1. Defaulting to kanji.")
             return 1, 0, 0, 0
-        #return mode
 
 
 if __name__ == '__main__':
