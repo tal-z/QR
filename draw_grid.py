@@ -2,40 +2,11 @@ import matplotlib.pyplot as plt
 from matplotlib import colors
 import numpy as np
 
-from helpers import pad_binary
+from helpers import pad_binary, bitstring_to_bytes
 from encoding_mode import get_encoding_mode
+from latin1_to_binary import encode_data
+from error_correction import generate_code_words
 
-''' Early Work
-version1_base_data = \
-    [[1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1],
-     [1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1],
-     [1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1, 0, 1],
-     [1, 0, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1, 0, 1],
-     [1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1, 0, 1],
-     [1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1],
-     [1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1],
-     [0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], # buf
-     [1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 0],
-     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-     [0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-     [0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-     [0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], # buf
-     [1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-     [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-     [1, 0, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-     [1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-     [1, 0, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-     [1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-     [1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0]
-     ]
-print(version1_base_data)
-cmap = colors.ListedColormap(['white', 'black'])
-
-plt.imshow(version1_base_data, cmap=cmap)
-
-plt.show()
-'''
 
 v1_base_grid = np.zeros((21, 21))
 
@@ -139,18 +110,70 @@ def draw_message_length(grid, data):
     grid[15, 20], grid[15, 19] = binary_values
 
 
+def draw_data(grid, data):
+    """
+    update matrix with data from encoded bitstring.
+    This includes encoding type and data length,
+    but not the error correction codewords.
 
-print(v1_base_grid)
+    :param grid:
+    :param data:
+    :return:
+    """
+
+    coords_dict = {
+        '0': [(20, 20), (20, 19), (19, 20), (19, 19), (18, 20), (18, 19), (17, 20), (17, 19)],
+        '1': [(16, 20), (16, 19), (15, 20), (15, 19), (14, 20), (14, 19), (13, 20), (13, 19)],
+        '2': [(12, 20), (12, 19), (11, 20), (11, 19), (10, 20), (10, 19), (9, 20), (9, 19)],
+        '3': [(9, 18), (9, 17), (10, 18), (10, 17), (11, 18), (11, 17), (12, 18), (12, 17)],
+        '4': [(13, 18), (13, 17), (14, 18), (14, 17), (15, 18), (15, 17), (16, 18), (16, 17)],
+        '5': [(17, 18), (17, 17), (18, 18), (18, 17), (19, 18), (19, 17), (20, 18), (20, 17)],
+        '6': [(20, 16), (20, 15), (19, 16), (19, 15), (18, 16), (18, 15), (17, 16), (17, 15)],
+        '7': [(16, 16), (16, 15), (15, 16), (15, 15), (14, 16), (14, 15), (13, 16), (13, 15)],
+        '8': [(12, 16), (12, 15), (11, 16), (11, 15), (10, 16), (10, 15), (9, 16), (9, 15)],
+        '9': [(9, 14), (9, 13), (10, 14), (10, 13), (11, 14), (11, 13), (12, 14), (12, 13)],
+        '10': [(13, 14), (13, 13), (14, 14), (14, 13), (15, 14), (15, 13), (16, 14), (16, 13)],
+        '11': [(17, 14), (17, 13), (18, 14), (18, 13), (19, 14), (19, 13), (20, 14), (20, 13)],
+        '12': [(20, 12), (20, 11), (19, 12), (19, 11), (18, 12), (18, 11), (17, 12), (17, 11)],
+        '13': [(16, 12), (16, 11), (15, 12), (15, 11), (14, 12), (14, 11), (13, 12), (13, 11)],
+        '14': [(12, 12), (12, 11), (11, 12), (11, 11), (10, 12), (10, 11), (9, 12), (9, 11)],
+        '15': [(8, 12), (8, 11), (7, 12), (7, 11), (5, 12), (5, 11), (4, 12), (4, 11)],
+    }
+    bitstring = encode_data(data)
+    encoded_data = bitstring_to_bytes(bitstring)
+
+    for i in range(16):
+        coords = coords_dict[str(i)]
+        bits = encoded_data[i]
+        for bit, coord in zip(bits, coords):
+            grid[coord] = bit
+
+
+
+
+
+
+
+# Update the QR Code
 draw_finder_patterns(v1_base_grid)
 draw_timing_patterns(v1_base_grid)
 draw_dark_module(v1_base_grid)
-draw_error_correction_level(v1_base_grid)
-draw_mode_indicator(v1_base_grid, 'talzaken.com')
-draw_mask_pattern(v1_base_grid)
-print(v1_base_grid)
-draw_message_length(v1_base_grid, 'talzaken.com')
+#draw_error_correction_level(v1_base_grid)
+#draw_mode_indicator(v1_base_grid, 'talzaken.com')
+#draw_mask_pattern(v1_base_grid)
+#draw_message_length(v1_base_grid, 'talzaken.com')
 
-# Plot and show the grid
+draw_data(v1_base_grid, 'talzaken.com')
+
+
+# Plot and show the QR Code
+fig, ax = plt.subplots()
 cmap = colors.ListedColormap(['white', 'black'])
+for i in range(0,21):
+    plt.vlines(i-.5, -.5, 20.5)
+    plt.hlines(i-.5, -.5, 20.5)
 plt.imshow(v1_base_grid, cmap=cmap)
+ax.set_xticks(range(0, 21))
+ax.set_yticks(range(0, 21))
+
 plt.show()
