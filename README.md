@@ -1,7 +1,7 @@
 # Toy QR Code Generator!
 
-This repo is a project where I am building a toy QR code generator in Python. 
-The goal is to make one single QR code from scratch, which re-directs to http://www.talzaken.com. 
+I built a toy QR code generator in Python. 
+The goal was to make one single QR code from scratch, which re-directs to http://www.talzaken.com. 
 It's a QR code generator that generates exactly one QR code!
 
 
@@ -18,7 +18,6 @@ It's a QR code generator that generates exactly one QR code!
   - For my Version (1) and Error Correction Level (M), I will need 128 bits in the QR code.
   - because my text is only 12 characters and I am using 8-bit encoding, this adds up to 96 bits. That means I will need to terminate my bit string with four zeros.
   - after terminating, we need to make the length of the bistring divisible by 8, which we do with more padding. it becomes 104 digits long.
-  - 
 
 ###### Step 3: Error Correction Coding - Using bits generated from text to generate "codewords," which help recover text if it becomes partially damaged. Reed-Solomon error correction.
 ###### Step 4: Structure a Final Message - This relates to the "interleaving" of data words and codewords. 
