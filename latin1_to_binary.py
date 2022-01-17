@@ -1,7 +1,7 @@
 
 from helpers import pad_binary
-from print_context_manager import VerboseControl
-
+from helpers import VerboseControl
+from encoding_mode import get_encoding_mode
 
 def latin1_to_padded_bytes_list(string):
     """
@@ -19,6 +19,19 @@ def latin1_to_bitstring(string):
     """
     binary = latin1_to_padded_bytes_list(string)
     return ''.join(binary)
+
+def add_encoding_type_and_length(bitstring, data):
+    """
+    Adds 12 bits to the front of a given bitstring, representing the type of data (first 4 bits)
+    and the length of the data (next 8 bits).
+
+    :param bitstring:
+    :param data:
+    :return bitstring:
+    """
+    encoding_mode_str = ''.join(str(digit) for digit in get_encoding_mode(data))
+    len_str = pad_binary(bin(len(data)))
+    return encoding_mode_str + len_str + bitstring
 
 
 def terminate_bitstring(bitstring, required_bits=128):
@@ -85,8 +98,11 @@ def encode_data(data, verbose=True):
         print("Converting input text to bitstring using latin-1 encoding.")
         bit_string = latin1_to_bitstring(data)
         print("~~ current bitstring:", bit_string)
+        print("Adding encoding type and data length to front of bitstring.")
+        meta_bit_string = add_encoding_type_and_length(bit_string, data)
+        print("~~ current bitstring:", meta_bit_string)
         print("Adding termination modules to bitstring based on required bit length.")
-        terminated_bit_string = terminate_bitstring(bit_string)
+        terminated_bit_string = terminate_bitstring(meta_bit_string)
         print("~~ current bitstring:", terminated_bit_string)
         print("Padding bitstring with zeros, such that its length is divisible by eight.")
         padded_terminated_bit_string = make_8_divisible_bitstring(terminated_bit_string)
@@ -98,4 +114,4 @@ def encode_data(data, verbose=True):
 
 
 if __name__ == '__main__':
-    encode_data('talzaken.com', verbose=False)
+    print(encode_data('talzaken.com', verbose=True))
