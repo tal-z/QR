@@ -4,7 +4,7 @@ I built a toy QR code generator in Python.
 The goal was to make one single QR code from scratch, which re-directs to http://www.talzaken.com. 
 It's a QR code generator that generates exactly one QR code!
 
-
+![talzaken.com](https://raw.githubusercontent.com/tal-z/QR/master/QR.png)
 
 ### QR Code Generation Steps:
 ###### Step 1: Data Analysis - Determine the data type to use based on the provided text.
