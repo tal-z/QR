@@ -12,6 +12,7 @@ from helpers import VerboseControl
 
 v1_base_grid = np.zeros((21, 21))
 
+
 def main(string, verbose=True):
     with VerboseControl(verbose=verbose):
         # Update the grid with QR code data
