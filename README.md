@@ -23,7 +23,7 @@ the steps needed to build them, and the basic concept of error correcting codes.
   9. Reserved spaces: whitespace that lets the QR code recognize the location of patterns.
 
 
-### QR Code Generation Steps:
+#### QR Code Generation Steps:
 ###### Step 1: Data Analysis - Determine the data type to use based on the provided text.
   - The `encoding_mode` module handles this.
 ###### Step 2: Data Encoding - Turning text into bits, using a method based on the text's data type
