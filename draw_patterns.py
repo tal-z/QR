@@ -109,6 +109,7 @@ def draw_message_length(grid, data, verbose=True):
         grid[15, 20], grid[15, 19] = binary_values
 
 
+
 def draw_data(grid, data, verbose=True):
     """
     update matrix with data from encoded bitstring.
@@ -119,34 +120,42 @@ def draw_data(grid, data, verbose=True):
     :param data:
     :return:
     """
+    Z = [
+        (0, 0), (0, 1),
+        (1, 0), (1, 1)
+    ]
+
+    STARTS = [
+        (20, 20, True),    (18, 20, True),   
+        (16, 20, True),    (14, 20, True),
+        (12, 20, True),    (10, 20, True),
+        (9, 18, False),     (11, 18, False),
+        (13, 18, False),    (15, 18, False),
+        (17, 18, False),    (19, 18, False),
+        (20, 16, True),    (18, 16, True),
+        (16, 16, True),    (14, 16, True),
+        (12, 16, True),    (10, 16, True),
+        (9, 14, False),     (11, 14, False),
+        (13, 14, False),    (15, 14, False),
+        (17, 14, False),    (19, 14, False),
+        (20, 12, True),    (18, 12, True),
+        (16, 12, True),    (14, 12, True),
+        (12, 12, True),    (10, 12, True),
+        (8, 12, True),      (5, 12, True), 
+    ]
+
     with VerboseControl(verbose=verbose):
         print("Drawing data, including mode indicator and message length")
-        coordinates_dict = {
-            0: [(20, 20), (20, 19), (19, 20), (19, 19), (18, 20), (18, 19), (17, 20), (17, 19)],
-            1: [(16, 20), (16, 19), (15, 20), (15, 19), (14, 20), (14, 19), (13, 20), (13, 19)],
-            2: [(12, 20), (12, 19), (11, 20), (11, 19), (10, 20), (10, 19), (9, 20), (9, 19)],
-            3: [(9, 18), (9, 17), (10, 18), (10, 17), (11, 18), (11, 17), (12, 18), (12, 17)],
-            4: [(13, 18), (13, 17), (14, 18), (14, 17), (15, 18), (15, 17), (16, 18), (16, 17)],
-            5: [(17, 18), (17, 17), (18, 18), (18, 17), (19, 18), (19, 17), (20, 18), (20, 17)],
-            6: [(20, 16), (20, 15), (19, 16), (19, 15), (18, 16), (18, 15), (17, 16), (17, 15)],
-            7: [(16, 16), (16, 15), (15, 16), (15, 15), (14, 16), (14, 15), (13, 16), (13, 15)],
-            8: [(12, 16), (12, 15), (11, 16), (11, 15), (10, 16), (10, 15), (9, 16), (9, 15)],
-            9: [(9, 14), (9, 13), (10, 14), (10, 13), (11, 14), (11, 13), (12, 14), (12, 13)],
-            10: [(13, 14), (13, 13), (14, 14), (14, 13), (15, 14), (15, 13), (16, 14), (16, 13)],
-            11: [(17, 14), (17, 13), (18, 14), (18, 13), (19, 14), (19, 13), (20, 14), (20, 13)],
-            12: [(20, 12), (20, 11), (19, 12), (19, 11), (18, 12), (18, 11), (17, 12), (17, 11)],
-            13: [(16, 12), (16, 11), (15, 12), (15, 11), (14, 12), (14, 11), (13, 12), (13, 11)],
-            14: [(12, 12), (12, 11), (11, 12), (11, 11), (10, 12), (10, 11), (9, 12), (9, 11)],
-            15: [(8, 12), (8, 11), (7, 12), (7, 11), (5, 12), (5, 11), (4, 12), (4, 11)],
-        }
         bitstring = encode_data(data)
-        byte_strings = bitstring_to_byte_strings(bitstring)
 
-        for idx in range(16):
-            coordinates = coordinates_dict[idx]
-            bits = byte_strings[idx]
-            for bit, coord in zip(bits, coordinates):
-                grid[coord] = bit
+        for ind, (i, j, up) in enumerate(STARTS): # up is a bool
+
+            # zigzag is 4 bit coordinates in the qr code
+            zigzag = [(i-x, j-y) for x,y in Z] if up else [(i+x, j-y) for x,y in Z]
+
+            for bit, coor in zip(bitstring[ind*4:ind*4+4], zigzag):
+                print(bit, coor)
+                grid[coor] = bit
 
 
 def draw_code_words(grid, data, verbose=True):
