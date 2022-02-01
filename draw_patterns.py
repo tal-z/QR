@@ -1,7 +1,7 @@
 
 import numpy as np
 
-from helpers import pad_binary, bitstring_to_byte_strings, VerboseControl
+from helpers import pad_binary, VerboseControl
 from encoding_mode import get_encoding_mode
 from latin1_to_binary import encode_data
 from error_correction import generate_code_words
@@ -149,12 +149,10 @@ def draw_data(grid, data, verbose=True):
         bitstring = encode_data(data)
 
         for ind, (i, j, up) in enumerate(STARTS): # up is a bool
-
             # zigzag is 4 bit coordinates in the qr code
             zigzag = [(i-x, j-y) for x,y in Z] if up else [(i+x, j-y) for x,y in Z]
-
+            # for each zigzag coordinate, change the grid cell according to the bit
             for bit, coor in zip(bitstring[ind*4:ind*4+4], zigzag):
-                print(bit, coor)
                 grid[coor] = bit
 
 
